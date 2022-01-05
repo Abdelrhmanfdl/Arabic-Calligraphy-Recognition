@@ -16,6 +16,9 @@ def get_features(data,edges):
         img_feature.append(before_after_morph(data[index][0]))
         img_feature.append(before_after_morph2(data[index][0]))
         img_feature.append(before_after_morph3(data[index][0]))
+        ratio_pixels_above_basline , ratio_pixels_below_basline = baseline(data[index][0])
+        img_feature.append(ratio_pixels_above_basline)
+        img_feature.append(ratio_pixels_below_basline)
         features.append(img_feature)
     return features
 #--------------------------------------
@@ -108,4 +111,18 @@ def before_after_morph3(img):
 #         last = ang - step
 #         count_ang[index][int(ang / step)] += ((orien >= last) & (orien < ang)).sum()
 #         ang += step   
+#--------------------------------------
+def baseline(img):
+    rows = len(img)  
+    histogram = list() 
+    img = np.array(img)
+    for index in range(int(rows/3),rows):
+        row = img[index , :]
+        hist = cv2.calcHist([row],[0],None,[256],[0,256]) 
+        histogram.append(hist[0][0])
+    basline_row = histogram. index(max(histogram))+int(rows/3)
+    ratio_pixels_above_basline = get_hist(img[:basline_row,:])
+    ratio_pixels_below_basline = get_hist(img[basline_row+1:,:])
+    return ratio_pixels_above_basline, ratio_pixels_below_basline
+    
          
