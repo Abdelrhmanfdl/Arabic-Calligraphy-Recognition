@@ -1,5 +1,7 @@
 import cv2
 import numpy as np
+from skimage.measure import label
+
 #--------------------------------------
 def get_features(data,edges):
     print("-----Extracting Features-----")
@@ -13,12 +15,14 @@ def get_features(data,edges):
         img_feature.append(compactness)
         img_feature.append(num_pix_per_col(data[index][0]))
         img_feature.append(num_pix_per_row(data[index][0]))
-        img_feature.append(before_after_morph(data[index][0]))
-        img_feature.append(before_after_morph2(data[index][0]))
-        img_feature.append(before_after_morph3(data[index][0]))
-        ratio_pixels_above_basline , ratio_pixels_below_basline = baseline(data[index][0])
-        img_feature.append(ratio_pixels_above_basline)
-        img_feature.append(ratio_pixels_below_basline)
+        # img_feature.append(before_after_morph(data[index][0]))
+        # img_feature.append(before_after_morph2(data[index][0]))
+        # img_feature.append(before_after_morph3(data[index][0]))
+        # ratio_pixels_above_basline , ratio_pixels_below_basline = baseline(data[index][0])
+        # img_feature.append(ratio_pixels_above_basline)
+        # img_feature.append(ratio_pixels_below_basline)
+        img_feature += [*oreinatation(data[index][0])]
+        img_feature.append(count_cc(data[index][0]))
         features.append(img_feature)
     return features
 #--------------------------------------
@@ -89,28 +93,34 @@ def before_after_morph3(img):
     img_copy = cv2.dilate(img_copy, kernel_di, iterations=1)
     return np.sum(img_copy)/num_bef
 #--------------------------------------
-# def oreinatation(data,img,index):    
-#     sobel_x = np.array([[ -1, 0, 1], 
-#                        [ -2, 0, 2], 
-#                        [ -1, 0, 1]])
-#     sobel_y = np.array([[ -1, -2, -1], 
-#                        [ 0, 0, 0], 
-#                        [ 1, 2, 1]])
-#     ang_category_count = 20
-#     count_ang = np.zeros((len(data), ang_category_count + 1))
-#     myImg = np.array(img)
-#     filtered_blurred_x = cv2.filter2D(myImg, cv2.CV_32F, sobel_x)
-#     filtered_blurred_y = cv2.filter2D(myImg, cv2.CV_32F, sobel_y)
-#     orien = cv2.phase(np.array(filtered_blurred_x, np.float32),
-#                       np.array(filtered_blurred_y, dtype=np.float32), 
-#                       angleInDegrees=True)
-#     orien = np.array(orien)
-#     step = 360/ang_category_count
-#     ang = step
-#     while(ang <= 360):
-#         last = ang - step
-#         count_ang[index][int(ang / step)] += ((orien >= last) & (orien < ang)).sum()
-#         ang += step   
+def oreinatation(myImg):    
+    sobel_x = np.array([[ -1, 0, 1], 
+                        [ -2, 0, 2], 
+                        [ -1, 0, 1]])
+
+    sobel_y = np.array([[ -1, -2, -1], 
+                        [ 0, 0, 0], 
+                        [ 1, 2, 1]])
+
+    ang_category_count = 20
+    count_ang = np.zeros(ang_category_count + 1)
+
+    filtered_blurred_x = cv2.filter2D(myImg, cv2.CV_32F, sobel_x)
+    filtered_blurred_y = cv2.filter2D(myImg, cv2.CV_32F, sobel_y)
+
+    orien = cv2.phase(np.array(filtered_blurred_x, np.float32),
+                    np.array(filtered_blurred_y, dtype=np.float32), 
+                    angleInDegrees=True)
+    orien = np.array(orien)
+    
+    step = 360/ang_category_count
+    ang = step
+    while(ang <= 360):
+        last = ang - step
+        count_ang[int(ang / step)] += ((orien >= last) & (orien <= ang)).sum()
+        ang += step
+    return count_ang
+
 #--------------------------------------
 def baseline(img):
     rows = len(img)  
@@ -126,3 +136,7 @@ def baseline(img):
     return ratio_pixels_above_basline, ratio_pixels_below_basline
     
          
+#--------------------------------------
+def count_cc(img):
+    _, cur_count_cc = label(1-img, connectivity=1, return_num=True)
+    return cur_count_cc
