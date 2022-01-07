@@ -12,12 +12,6 @@ def get_features(data,edges):
         img_feature.append(HVSL(edges[index]))
         img_feature.append(num_pix_per_col(data[index][0]))
         img_feature.append(num_pix_per_row(data[index][0]))
-        # img_feature.append(before_after_morph(data[index][0]))
-        # img_feature.append(before_after_morph2(data[index][0]))
-        # img_feature.append(before_after_morph3(data[index][0]))
-        # ratio_pixels_above_basline , ratio_pixels_below_basline = baseline(data[index][0])
-        # img_feature.append(ratio_pixels_above_basline)
-        # img_feature.append(ratio_pixels_below_basline)
         img_feature += [*oreinatation(data[index][0])]
         img_feature.append(count_cc(data[index][0]))
         features.append(img_feature)
@@ -58,33 +52,6 @@ def num_pix_per_row(img):
         if zero_idx.shape[0]: R = freq.shape[-1]
         avg = np.sum(freq[L : R+1]) / (R - L)
         return avg
-#--------------------------------------    
-def before_after_morph(img):
-    num_bef = np.sum(img)
-    img_copy = np.array(img)
-    kernel = np.ones((5,5), np.uint8)
-    img_copy = cv2.dilate(img_copy, kernel, iterations=1)
-    img_copy = cv2.erode(img_copy, kernel, iterations=2)
-    return np.sum(img_copy)/num_bef
-#--------------------------------------
-def before_after_morph2(img):
-    num_bef = np.sum(img)
-    img_copy = np.array(img)
-    kernel_di = np.ones((7,7), np.uint8)
-    kernel_er = np.ones((7,1), np.uint8)
-    img_copy = cv2.dilate(img_copy, kernel_di, iterations=1)
-    img_copy = cv2.erode(img_copy, kernel_er, iterations=2)
-    return np.sum(img_copy)/num_bef
-#--------------------------------------
-def before_after_morph3(img):
-    num_bef = np.sum(img)
-    img_copy = np.array(img)
-    kernel_di = np.ones((1,7), np.uint8)
-    kernel_er = np.ones((5,4), np.uint8)
-    img_copy = cv2.dilate(img_copy, kernel_di, iterations=2)
-    img_copy = cv2.erode(img_copy, kernel_er, iterations=3)
-    img_copy = cv2.dilate(img_copy, kernel_di, iterations=1)
-    return np.sum(img_copy)/num_bef
 #--------------------------------------
 def oreinatation(myImg):    
     sobel_x = np.array([[ -1, 0, 1], 
@@ -112,27 +79,7 @@ def oreinatation(myImg):
         last = ang - step
         count_ang[int(ang / step)] += ((orien >= last) & (orien <= ang)).sum()
         ang += step
-    return count_ang
-
-#--------------------------------------
-def baseline(img):
-    rows = len(img)  
-    histogram = list() 
-    img = np.array(img)
-    for index in range(int(rows/3),rows):
-        row = img[index , :]
-        hist = cv2.calcHist([row],[0],None,[256],[0,256]) 
-        histogram.append(hist[0][0])
-    basline_row = histogram. index(max(histogram))+int(rows/3)
-    try:
-        ratio_pixels_above_basline = get_hist(img[:basline_row,:])
-    except:
-        ratio_pixels_above_basline = 0
-    try:    
-        ratio_pixels_below_basline = get_hist(img[basline_row+1:,:])
-    except:
-        ratio_pixels_below_basline = 0
-    return ratio_pixels_above_basline, ratio_pixels_below_basline  
+    return count_ang 
 #--------------------------------------
 def count_cc(img):
     _, cur_count_cc = label(1-img, connectivity=1, return_num=True)

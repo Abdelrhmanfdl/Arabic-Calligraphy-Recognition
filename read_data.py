@@ -11,7 +11,6 @@ def read_all_data():
     return data
 #--------------------------------------------------------
 def read_style(data,label,filepath):
-    ## images for diwani
     for filename in sorted(glob.glob(filepath)):
         img = cv2.imread(filename) ## cv2.imread reads images in RGB format
         data.append([img,label])
