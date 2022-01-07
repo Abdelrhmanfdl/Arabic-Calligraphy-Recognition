@@ -9,8 +9,8 @@ def train_model(data,features):
     model = RandomForestClassifier()
     # Fit model
     model.fit(X_train, y_train)
-    accuracy = model_accuracy(model,X_train, y_train, X_val, y_val, X_test, y_test,data, features)
-    return accuracy
+    model_accuracy(model,X_train, y_train, X_val, y_val, X_test, y_test,data, features)
+    return model
     
 #--------------------------------------    
 def split_data(data,features):
@@ -62,5 +62,4 @@ def model_accuracy(model,X_train, y_train, X_val, y_val, X_test, y_test,data, fe
     #Squar-kufic
     val_predictions = model.predict(features[1495:])
     print("Accuracy of Squar-kufic:",(metrics.accuracy_score(data[1495:,1], val_predictions))*100)
-    return (metrics.accuracy_score(y_test, test_predictions))*100
 
