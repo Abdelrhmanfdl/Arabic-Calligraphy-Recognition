@@ -28,17 +28,25 @@ results = open(out_dirct+'results.txt', 'w')
 times = open(out_dirct+'times.txt', 'w')
 for filename in sorted(glob.glob(test_dirct+"*.png")):
     start = time()
-    data = list()
-    img = cv2.imread(filename) ## cv2.imread reads images in RGB format
-    data.append([img,'dummy'])
-    data , edges = preprocessing.pre_processing(data)
-    data_features = features.get_features(data,edges)
-    test_predictions = model.predict(data_features)
-    results.write(str(dictionary[test_predictions[0]])+"\n")
-    end = time()
-    time_taken = end - start
-    if time_taken == 0.0:
-        time_taken = (1/1000)
-    times.write(str(time_taken)+"\n")
+    try:
+        data = list()
+        img = cv2.imread(filename) ## cv2.imread reads images in RGB format
+        data.append([img,'dummy'])
+        data , edges = preprocessing.pre_processing(data)
+        data_features = features.get_features(data,edges)
+        test_predictions = model.predict(data_features)
+        results.write(str(dictionary[test_predictions[0]])+"\n")
+        end = time()
+        time_taken = end - start
+        if time_taken == 0.0:
+            time_taken = (1/1000)
+        times.write(str(time_taken)+"\n")
+    except:
+        results.write("-1\n")
+        end = time()
+        time_taken = end - start
+        if time_taken == 0.0:
+            time_taken = (1/1000)
+        times.write(str(time_taken)+"\n")
     
     
