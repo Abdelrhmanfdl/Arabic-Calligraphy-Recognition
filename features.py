@@ -10,9 +10,6 @@ def get_features(data,edges):
         img_feature = list()
         img_feature.append(get_hist(data[index][0]))
         img_feature.append(HVSL(edges[index]))
-        #c_c , compactness = connected_components(data[index][0])
-        #img_feature.append(c_c)
-        #img_feature.append(compactness)
         img_feature.append(num_pix_per_col(data[index][0]))
         img_feature.append(num_pix_per_row(data[index][0]))
         # img_feature.append(before_after_morph(data[index][0]))
@@ -37,10 +34,6 @@ def HVSL(img):
     if lines is not None:
         L = len(lines)
     return L
-#--------------------------------------
-def connected_components(img):
-    n,_=cv2.connectedComponents(img)
-    return n , (n/(img.shape[0]*img.shape[1]))
 #--------------------------------------
 def num_pix_per_col(img):
     freq = np.sum(img, axis=0)
@@ -131,11 +124,15 @@ def baseline(img):
         hist = cv2.calcHist([row],[0],None,[256],[0,256]) 
         histogram.append(hist[0][0])
     basline_row = histogram. index(max(histogram))+int(rows/3)
-    ratio_pixels_above_basline = get_hist(img[:basline_row,:])
-    ratio_pixels_below_basline = get_hist(img[basline_row+1:,:])
-    return ratio_pixels_above_basline, ratio_pixels_below_basline
-    
-         
+    try:
+        ratio_pixels_above_basline = get_hist(img[:basline_row,:])
+    except:
+        ratio_pixels_above_basline = 0
+    try:    
+        ratio_pixels_below_basline = get_hist(img[basline_row+1:,:])
+    except:
+        ratio_pixels_below_basline = 0
+    return ratio_pixels_above_basline, ratio_pixels_below_basline  
 #--------------------------------------
 def count_cc(img):
     _, cur_count_cc = label(1-img, connectivity=1, return_num=True)

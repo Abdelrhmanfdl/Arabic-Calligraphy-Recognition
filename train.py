@@ -15,9 +15,9 @@ def train_model(data,features):
 #--------------------------------------    
 def split_data(data,features):
     X_train, X_test, y_train, y_test = train_test_split(features, data[:,1], 
-        test_size=0.2, shuffle = True, random_state = 8)
+        test_size=0.2, shuffle = True, random_state = 0)
     X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, 
-        test_size=0.2, random_state= 8) 
+        test_size=0.2, random_state= 0) 
     return X_train, y_train, X_val, y_val, X_test, y_test
 
 def model_accuracy(model,X_train, y_train, X_val, y_val, X_test, y_test,data, features):

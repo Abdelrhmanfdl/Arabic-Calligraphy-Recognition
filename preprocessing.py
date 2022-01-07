@@ -7,7 +7,7 @@ def pre_processing(data):
     for index in range(len(data)):
         data[index][0] = binarize(data[index][0])
         data[index][0] = check_background(data[index][0])
-        # data[index][0] = ero_dil(data[index][0])
+        #data[index][0] = ero_dil(data[index][0])
         edges.append(edge_detection(data[index][0]))
     return data , edges
 #--------------------------------------
