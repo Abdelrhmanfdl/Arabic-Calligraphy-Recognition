@@ -3,6 +3,7 @@ import preprocessing
 import features
 import train
 import pickle
+import cv2
 
 data = read_data.read_all_data()
 data , edges = preprocessing.pre_processing(data)
